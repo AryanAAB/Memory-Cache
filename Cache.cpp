@@ -182,6 +182,11 @@ pair<ll, ll> getMissHit(ll blockSize, ll cacheSize, ll ways, const string & file
     return make_pair(c.getNumHits(), c.getNumMisses());
 }
 
+double getHitRate(pair<ll, ll> & p)
+{
+    return 1.0 * p.first / (p.first + p.second);
+}
+
 void firstQ(ll blockSize, ll cacheSize, ll ways)
 {
     for(int i = 0; i < fileNames.size(); i++)
@@ -196,18 +201,58 @@ void firstQ(ll blockSize, ll cacheSize, ll ways)
 }
 
 void secondQ()
-{   
-    for(ll j = 128; j <= 4096; j *= 2)
+{
+    for(int i = 0; i < fileNames.size(); i++)
     {
-        cout << "Block Size: " << j << endl;
-        firstQ(4, j, 4);
+        cout << fileNames[i] << endl;
+        for(ll j = 128; j <= 4096; j *= 2)
+        {
+            auto p = getMissHit(4, j, 4, fileNames[i]);
+
+            cout << getHitRate(p) << "," << (1-getHitRate(p)) << "," << j << "," << "4,4" << endl;
+        }
     }
 
 }
 
+void thirdQ()
+{
+    for(int i = 0; i < fileNames.size(); i++)
+    {
+        cout << fileNames[i] << endl;
+        for(ll j = 1; j <= 128; j *= 2)
+        {
+            auto p = getMissHit(j, 1024, 4, fileNames[i]);
+
+            cout << getHitRate(p) << "," << (1-getHitRate(p)) << "," << 1024 << "," << j << ",4" << endl;
+        }
+    }
+}
+
+void fourthQ()
+{
+    for(int i = 0; i < fileNames.size(); i++)
+    {
+        cout << fileNames[i] << endl;
+        for(ll j = 1; j <= 64; j *= 2)
+        {
+            auto p = getMissHit(4, 1024, j, fileNames[i]);
+
+            cout << getHitRate(p) << "," << (1-getHitRate(p)) << "," << 1024 << ",4," << j << endl;
+        }
+    }
+}
+
 int main()
 {
-    firstQ(4, 1024, 4);
-    cout << endl;
+    cout << fixed;
+    cout << setprecision(10);
+
+    //firstQ(4, 1024, 4);
+    // cout << endl;
     secondQ();
+    // cout << endl;
+    //thirdQ();
+    // cout << endl;
+    //fourthQ();
 }
