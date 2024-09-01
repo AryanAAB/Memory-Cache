@@ -250,9 +250,9 @@ int main()
 
     //firstQ(4, 1024, 4);
     // cout << endl;
-    secondQ();
+    // secondQ();
     // cout << endl;
-    //thirdQ();
+    // thirdQ();
     // cout << endl;
-    //fourthQ();
+    fourthQ();
 }
