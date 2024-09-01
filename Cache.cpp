@@ -1,124 +1,213 @@
 #include <bits/stdc++.h>
-#include<vector>
 using namespace std;
+typedef long long int ll;
 
 class Line
 {
     private:
-        int tag;
-        int validBit;
-        
+        ll tag;
+        ll validBit;
+
     public:
-        Line(int tag)
+        Line()
         {
-            this->tag = tag;
             this->validBit = 0;       //initially validBit is 0 since no data present in the cache
         }
 
-        int getTag() const
+        ll getTag() const
         {
             return this->tag;
         }
 
-        int getValidBit() const
+        void setTag(ll tag)
+        {
+            this->tag = tag;
+            this->validBit = 1;
+        }
+
+        ll getValidBit() const
         {
             return this->validBit;
         }
 
-        int setValidBit()
+        void setValidBit()
         {
             this->validBit = 1;
         }
 
-        int resetValidBit()
+        void resetValidBit()
         {
             this->validBit = 0;
         }
-};
-
-class Set
-{
-    
-};
-
-class Way
-{
-    private:
-        vector<Line> lines;
-        int numLines;
-        int indexBits;
-    
-    public:
-        Way(int numLines)
-        {
-            this->numLines=numLines;
-
-            this->lines = vector<Line>(this->numLines);     //creating a vector of lines of having numLines as the number of lines.
-
-            this->indexBits = (int)log2(this->numLines);         //this gives us the number of bits for index.
-        }
-
-        bool lineFree(int address)
-        {
-            int index = address & (1 << (this->indexBits + 1) - 1);
-            int tag = address >> (this->indexBits);
-
-            !this->lines[index].getValidBit();
-        }
-};  
+}; 
 
 class Cache
 {
     private:
-        int blockSize;
-        int cacheSize;
-        int ways;
-        int sets;
+        ll blockSize;
+        ll cacheSize;
+        ll numWays;
+        ll sets;
+        vector<vector<Line>> LRU;
+        ll numMisses, numHits;
 
     public:
-        const static int KILO_BYTE = 1024;
+        const static ll KILO_BYTE = 1024;
 
     public:
         
-        Cache(int blockSize, int cacheSize, int ways)
+        Cache(ll blockSize, ll cacheSize, ll numWays)
         {
-            if(blockSize <= 0 || cacheSize <= 0 || ways <= 0 
-                || (this->blockSize & (this->blockSize-1))!=0 || (this->cacheSize & (this->cacheSize-1))!=0 || (this->ways & (this->ways-1)!=0))
+            if(blockSize <= 0 || cacheSize <= 0 || numWays <= 0 
+                || (blockSize & (blockSize-1))!=0 || (cacheSize & (cacheSize-1))!=0 || (numWays & (numWays-1)!=0))
             {
                 throw invalid_argument("Received Invalid Input.");
             }
             
             this->blockSize=blockSize;
             this->cacheSize=cacheSize;
-            this->ways=ways;
+            this->numWays=numWays;
 
-            this->sets = this->cacheSize * KILO_BYTE / ( this->ways * this->blockSize );
+            this->sets = this->cacheSize * KILO_BYTE / ( this->numWays * this->blockSize );
             
             if(this->sets & (this->sets - 1) != 0)
             {
                 throw invalid_argument("Received Invalid Input.");
             }
+
+            for(ll i = 0; i < sets; i++)
+            {
+                LRU.push_back(vector<Line>());
+
+                for(ll j = 0; j < numWays; j++)
+                {
+                    LRU[i].push_back(Line());
+                }
+            }
+        
+            this->numHits = this->numMisses = 0;
         }
 
-        int getBlockSize() const
+        ll getBlockSize() const
         {
             return this->blockSize;
         }
 
-        int getCacheSize() const
+        ll getCacheSize() const
         {
             return this->cacheSize;
         }
 
-        int getWays() const
+        ll getnumWays() const
         {
-            return this->ways;
+            return this->numWays;
         }
 
-        int getSets() const
+        ll getSets() const
         {
             return this->sets;
         }
+
+        ll getNumHits() const
+        {
+            return this->numHits;
+        }
+
+        ll getNumMisses() const
+        {
+            return this->numMisses;
+        }
+        
+        void addData(ll address)
+        {
+            ll byteOffset = address & (blockSize - 1);
+
+            ll rest = address >> (ll)(log2(blockSize));
+
+            ll index = rest & (sets - 1);
+
+            ll tag = rest >> (ll)(log2(sets));
+
+            for(ll i = 0; i < LRU[index].size(); i++)
+            {
+                if(LRU[index][i].getValidBit() && LRU[index][i].getTag() == tag)
+                {
+                    for (ll j = i; j>0; j--)
+                    {
+                        swap(LRU[index][j], LRU[index][j-1]);
+                    }
+                    
+                    numHits++;
+                    return;
+                }
+            }
+
+            LRU[index][numWays - 1].setTag(tag);
+            for (ll j = numWays-1; j>0; j--)
+            {
+                swap(LRU[index][j], LRU[index][j-1]);
+            }
+
+            numMisses++;
+        }
 };
 
-            
+const vector<string> fileNames = {"gcc.trace", "gzip.trace", "mcf.trace", "swim.trace", "twolf.trace"};
+
+pair<ll, ll> getMissHit(ll blockSize, ll cacheSize, ll ways, const string & fileName)
+{
+    Cache c(blockSize, cacheSize, ways);
+
+    ifstream file("traces/" + fileName);
+    string line;
+    vector<string> address; // Vector to store the middle strings
+
+    while (getline(file, line)) 
+    {
+        istringstream iss(line);
+        string first, middle, last;
+
+        // Extract the three strings
+        if (iss >> first >> middle >> last) 
+        {
+            address.push_back(middle); // Store the middle string in the vector
+        }
+    }
+
+    for(string s : address)
+    {
+        c.addData(stoll(s.substr(2), nullptr, 16));
+    }
+
+    return make_pair(c.getNumHits(), c.getNumMisses());
+}
+
+void firstQ(ll blockSize, ll cacheSize, ll ways)
+{
+    for(int i = 0; i < fileNames.size(); i++)
+    {
+        auto p = getMissHit(blockSize, cacheSize, ways, fileNames[i]);
+
+        cout << fileNames[i] << endl;
+        cout << "\tHit Rate: "<< 1.0 * p.first / (p.first + p.second) << endl;
+        cout << "\tMiss Rate: "<< 1.0 * p.second / (p.first + p.second) << endl;
+        cout << endl;
+    }
+}
+
+void secondQ()
+{   
+    for(ll j = 128; j <= 4096; j *= 2)
+    {
+        cout << "Block Size: " << j << endl;
+        firstQ(4, j, 4);
+    }
+
+}
+
+int main()
+{
+    firstQ(4, 1024, 4);
+    cout << endl;
+    secondQ();
+}
