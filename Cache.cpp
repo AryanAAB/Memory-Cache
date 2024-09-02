@@ -246,13 +246,13 @@ void fourthQ()
 int main()
 {
     cout << fixed;
-    cout << setprecision(10);
+    cout << setprecision(15);
 
     //firstQ(4, 1024, 4);
     // cout << endl;
-    // secondQ();
+    //secondQ();
     // cout << endl;
-    // thirdQ();
+    //thirdQ();
     // cout << endl;
     fourthQ();
 }

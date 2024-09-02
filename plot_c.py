@@ -31,6 +31,8 @@ file_path = 'Q3Ans.txt'
 # Read rates from the file
 data = read_rates(file_path)
 
+diff = 0.000001
+
 # Plotting for each trace
 for trace, values in data.items():
     # Plot Block Size vs Miss Rate
@@ -39,7 +41,7 @@ for trace, values in data.items():
     plt.xlabel('Block Size (B)')
     plt.ylabel('Miss Rate')
     plt.title(f'Block Size vs Miss Rate for {trace}')
-    plt.ylim(min(values["miss_rates"]) - 0.01, max(values["miss_rates"]) + 0.01)  # Adjusting y-axis for precision
+    plt.ylim(min(values["miss_rates"]) - diff, max(values["miss_rates"]) + diff)  # Adjusting y-axis for precision
     plt.grid(True)
     plt.show()
 
