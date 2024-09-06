@@ -12,17 +12,20 @@ def read_rates(file_path):
 
     current_trace = None
 
+    # Read the file line by line
     with open(file_path, 'r') as file:
         lines = file.readlines()
         for line in lines:
+            # Check if the line contains the trace name
             if line.strip().endswith('.trace'):
                 current_trace = line.strip().replace('.trace', '')
+            # Otherwise, read the hit rates and number of ways
             else:
                 hit_rate, _, _, _, num_ways = map(float, line.split(','))
                 data[current_trace]["hit_rates"].append(hit_rate)
                 data[current_trace]["num_ways"].append(int(num_ways))
 
-    return data
+    return data     # Return the dictionary containing the data
 
 # Path to the text file containing the data
 file_path = 'Q4Ans.txt'

@@ -12,18 +12,21 @@ def read_rates(file_path):
 
     current_trace = None
 
+    # Read the file line by line
     with open(file_path, 'r') as file:
         lines = file.readlines()
         for line in lines:
+            # Check if the line contains the trace name
             if line.strip().endswith('.trace'):
                 current_trace = line.strip().replace('.trace', '')
+            # Otherwise, read the hit rates, miss rates, and block sizes
             else:
                 hit_rate, miss_rate, _, block_size, _ = map(float, line.split(','))
                 data[current_trace]["hit_rates"].append(hit_rate)
                 data[current_trace]["miss_rates"].append(miss_rate)
                 data[current_trace]["block_sizes"].append(int(block_size))
 
-    return data
+    return data     # Return the dictionary containing the data
 
 # Path to the text file containing the data
 file_path = 'Q3Ans.txt'
