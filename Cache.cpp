@@ -2,6 +2,14 @@
 using namespace std;
 typedef long long int ll;
 
+pair<ll, ll> getMissHit(ll, ll, ll, const string &);
+double getHitRate(pair<ll, ll> &);
+void print(ll, ll, ll, pair<ll, ll> &);
+void firstQ(ll, ll, ll);
+void secondQ(bool);
+void thirdQ(bool);
+void fourthQ(bool);
+
 class Line
 {
     private:
@@ -11,7 +19,7 @@ class Line
     public:
         Line()
         {
-            this->validBit = 0;       //initially validBit is 0 since no data present in the cache
+            this->validBit = 0;       //initially validBit is 0 since no data present in the line
         }
 
         ll getTag() const
@@ -187,6 +195,14 @@ double getHitRate(pair<ll, ll> & p)
     return 1.0 * p.first / (p.first + p.second);
 }
 
+void print(ll cacheSize, ll blockSize, ll ways, pair<ll, ll> & p)
+{
+    cout << "\tCache Size: " << cacheSize << "KB, Block Size: " << blockSize << "B, Num Ways: " << ways << endl;
+    cout << "\t\tHit Rate : " << getHitRate(p) << endl;
+    cout << "\t\tMiss Rate: " << (1-getHitRate(p)) << endl;
+    cout << endl;
+}
+
 void firstQ(ll blockSize, ll cacheSize, ll ways)
 {
     for(int i = 0; i < fileNames.size(); i++)
@@ -194,13 +210,11 @@ void firstQ(ll blockSize, ll cacheSize, ll ways)
         auto p = getMissHit(blockSize, cacheSize, ways, fileNames[i]);
 
         cout << fileNames[i] << endl;
-        cout << "\tHit Rate: "<< 1.0 * p.first / (p.first + p.second) << endl;
-        cout << "\tMiss Rate: "<< 1.0 * p.second / (p.first + p.second) << endl;
-        cout << endl;
+        print(cacheSize, blockSize, ways, p);
     }
 }
 
-void secondQ()
+void secondQ(bool toPrint)
 {
     for(int i = 0; i < fileNames.size(); i++)
     {
@@ -209,13 +223,16 @@ void secondQ()
         {
             auto p = getMissHit(4, j, 4, fileNames[i]);
 
-            cout << getHitRate(p) << "," << (1-getHitRate(p)) << "," << j << "," << "4,4" << endl;
+            if(toPrint)
+                print(4, j, 4, p);
+            else
+                cout << getHitRate(p) << "," << (1-getHitRate(p)) << "," << j << "," << "4,4" << endl;
         }
     }
 
 }
 
-void thirdQ()
+void thirdQ(bool toPrint)
 {
     for(int i = 0; i < fileNames.size(); i++)
     {
@@ -224,12 +241,15 @@ void thirdQ()
         {
             auto p = getMissHit(j, 1024, 4, fileNames[i]);
 
-            cout << getHitRate(p) << "," << (1-getHitRate(p)) << "," << 1024 << "," << j << ",4" << endl;
+            if(toPrint)
+                print(j, 1024, 4, p);
+            else
+                cout << getHitRate(p) << "," << (1-getHitRate(p)) << "," << 1024 << "," << j << ",4" << endl;
         }
     }
 }
 
-void fourthQ()
+void fourthQ(bool toPrint)
 {
     for(int i = 0; i < fileNames.size(); i++)
     {
@@ -237,22 +257,50 @@ void fourthQ()
         for(ll j = 1; j <= 64; j *= 2)
         {
             auto p = getMissHit(4, 1024, j, fileNames[i]);
-
-            cout << getHitRate(p) << "," << (1-getHitRate(p)) << "," << 1024 << ",4," << j << endl;
+            
+            if(toPrint)
+                print(4, 1024, j, p);
+            else
+                cout << getHitRate(p) << "," << (1-getHitRate(p)) << "," << 1024 << ",4," << j << endl;
         }
     }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
     cout << fixed;
-    cout << setprecision(15);
+    cout << setprecision(20); 
 
-    //firstQ(4, 1024, 4);
-    // cout << endl;
-    //secondQ();
-    // cout << endl;
-    //thirdQ();
-    // cout << endl;
-    fourthQ();
+    if(argc == 1)
+    {
+        cout << "Question 1" << endl << endl;
+        firstQ(4, 1024, 4);
+        cout << endl << "Question 2" << endl << endl;
+        secondQ(true);
+        cout << endl << "Question 3" << endl << endl;
+        thirdQ(true);
+        cout << endl << "Question 4" << endl << endl;
+        fourthQ(true);
+        cout << endl;
+    }
+    else if(strcmp(argv[1], "1") == 0)
+    {
+        firstQ(4, 1024, 4);
+    }
+    else if(strcmp(argv[1], "2") == 0)
+    {
+        secondQ(false);
+    }
+    else if(strcmp(argv[1], "3") == 0)
+    {
+        thirdQ(false);
+    }
+    else if(strcmp(argv[1], "4") == 0)
+    {
+        fourthQ(false);
+    }
+    else
+    {
+        throw invalid_argument("Wrong input provided.");
+    }
 }
