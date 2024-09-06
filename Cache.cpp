@@ -3,13 +3,57 @@ using namespace std;
 typedef long long int ll;
 
 // Function Prototypes
-pair<ll, ll> getMissHit(ll, ll, ll, const string &);    // Returns the number of hits and misses
-double getHitRate(pair<ll, ll> &);          // Returns the hit rate
-void print(ll, ll, ll, pair<ll, ll> &);     // Prints cache size, block size, num ways, hit rate and miss rate
-void firstQ(ll, ll, ll);                    // First Question
-void secondQ(bool);                         // Second Question
-void thirdQ(bool);                          // Third Question
-void fourthQ(bool);                         // Fourth Question
+/**
+ * @brief Calculates the number of cache hits and misses for a given file trace.
+ * @param blockSize Size of each block in the cache.
+ * @param cacheSize Total size of the cache.
+ * @param ways Number of ways for the cache.
+ * @param fileName The name of the trace file to read.
+ * @return A pair containing the number of hits and misses.
+ */
+pair<ll, ll> getMissHit(ll, ll, ll, const string &);
+
+/**
+ * @brief Calculates the hit rate based on hits and misses.
+ * @param p A pair containing the number of hits and misses.
+ * @return The hit rate as a percentage.
+ */
+double getHitRate(pair<ll, ll> &);
+
+/**
+ * @brief Prints the cache parameters and corresponding hit and miss rates.
+ * @param cacheSize Size of the cache.
+ * @param blockSize Size of the block.
+ * @param ways Number of ways for the cache.
+ * @param p A pair containing the number of hits and misses.
+ */
+void print(ll, ll, ll, pair<ll, ll> &);
+
+/**
+ * @brief Runs the first cache simulation question.
+ * @param blockSize Size of the block.
+ * @param cacheSize Size of the cache.
+ * @param ways Number of ways for the cache.
+ */
+void firstQ(ll, ll, ll);
+
+/**
+ * @brief Runs the second cache simulation question.
+ * @param toPrint Boolean flag to print the result or not.
+ */
+void secondQ(bool);
+
+/**
+ * @brief Runs the third cache simulation question.
+ * @param toPrint Boolean flag to print the result or not.
+ */
+void thirdQ(bool);
+
+/**
+ * @brief Runs the fourth cache simulation question.
+ * @param toPrint Boolean flag to print the result or not.
+ */
+void fourthQ(bool);
 
 
 // CLass representing Cache Line
@@ -67,7 +111,12 @@ class Cache
         const static ll KILO_BYTE = 1024;   // 1 KB = 1024 Bytes
 
     public:
-        
+        /**
+         * @brief Constructs a cache with the given parameters.
+         * @param blockSize Block size in bytes.
+         * @param cacheSize Cache size in kilobytes.
+         * @param numWays Number of ways for set-associative cache.
+         */
         Cache(ll blockSize, ll cacheSize, ll numWays)
         {   
             // Checking for invalid input values and throwing exception
@@ -135,7 +184,10 @@ class Cache
             return this->numMisses;
         }
         
-        // Function to add data to the Cache
+        /**
+         * @brief Adds an address to the cache, performing LRU replacement if necessary.
+         * @param address The memory address to be added.
+         */
         void addData(ll address)
         {
             ll byteOffset = address & (blockSize - 1);      // Byte offset
